@@ -18,7 +18,6 @@ RUN buildDeps=" \
     " \
     && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y $buildDeps $runtimeDeps \
     && docker-php-ext-install bcmath bz2 calendar iconv intl mbstring zip \
-    && docker-php-ext-install gd \
     && apt-get -y install libgmp-dev \
     && docker-php-ext-configure gmp \
     && docker-php-ext-install gmp \
