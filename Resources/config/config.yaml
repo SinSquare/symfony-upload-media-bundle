@@ -1,0 +1,10 @@
+parameters:
+    env(UPLOADED_MEDIA_DIRECTORY): '/tmp/uploaded_media'
+    uploaded_media_directory: '%env(resolve:UPLOADED_MEDIA_DIRECTORY)%'
+services:
+    UploadMediaBundle\Controller\UploadMediaController:
+        tags: ['controller.service_arguments']
+        
+    # UploadMediaBundle\EventListener\AddFilesizeListener:
+    #     tags:
+    #         - { name: kernel.event_listener, event: uploadmedia.response, method: addFilesize }

@@ -1,0 +1,11 @@
+services:
+    logger:
+        class: UploadMediaBundle\Tests\Functional\app\Service\DummyLogger
+    # test.client:
+    #     class: Symfony\Bundle\FrameworkBundle\KernelBrowser
+    #     public: true
+    #     arguments:
+    #         - '@kernel'
+    #         - '%test.client.parameters%'
+    #         - '@test.client.history'
+    #         - '@test.client.cookiejar'

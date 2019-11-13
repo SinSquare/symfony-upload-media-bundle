@@ -1,0 +1,22 @@
+single_form:
+    path: /single-form
+    methods: [GET, POST]
+    defaults:  { _controller: \UploadMediaBundle\Tests\Functional\app\Controller\TestController::getSingleAction }
+
+multiple_form:
+    path: /multiple-form
+    methods: [GET, POST]
+    defaults:  { _controller: \UploadMediaBundle\Tests\Functional\app\Controller\TestController::getMultipleAction }
+
+not_empty_single_form:
+    path: /not-empty-single-form
+    methods: [GET, POST]
+    defaults:  { _controller: \UploadMediaBundle\Tests\Functional\app\Controller\TestController::getNotEmptySingleForm }
+
+not_empty_multiple_form:
+    path: /not-empty-multiple-form
+    methods: [GET, POST]
+    defaults:  { _controller: \UploadMediaBundle\Tests\Functional\app\Controller\TestController::getNotEmptyMultipleForm }
+
+_media:
+    resource: '@UploadMediaBundle/Resources/config/routes.yaml'    

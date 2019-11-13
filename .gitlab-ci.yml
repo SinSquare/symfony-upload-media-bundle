@@ -1,0 +1,41 @@
+image: docker:stable
+
+services:
+  - docker:dind
+
+variables:
+  CONTAINER_IMAGE: registry.gitlab.com/$CI_PROJECT_PATH
+  DOCKER_DRIVER: overlay2
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+  - docker version
+
+stages:
+  - test
+
+test:
+  stage: test
+  image: docker:stable
+  services:
+    - docker:dind
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:test_image
+  script:
+    # build test image
+    - sh Resources/gitlab_ci/pull_cache.sh "$CI_COMMIT_MESSAGE" "$IMAGE_PATH"
+    - docker build --build-arg WITH_XDEBUG=true --cache-from $IMAGE_PATH --tag $IMAGE_PATH --tag test_image -f ./Resources/gitlab_ci/Dockerfile .
+    - docker push $IMAGE_PATH
+    # install docker compose
+    - apk add --update python py-pip python-dev && pip install --quiet docker-compose~=1.23.0
+    - docker-compose version
+    # start containers
+    - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml up -d
+    # init
+    - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") composer install --prefer-dist
+    # testing
+    - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") php vendor/bin/phpunit --coverage-text --colors=never
+    # stopping container
+    - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml down
+  tags:
+    - docker

@@ -1,0 +1,18 @@
+{% block upload_media_widget -%}
+<div class="upload_media_container" id="{{ id }}_container">
+    <div class="row fileupload-container">
+        <div class="col">
+            <div class="custom-file">
+                <input type="file" class="fileupload custom-file-input" accept="{{ accept }}" data-url="{{ path(upload_path_name) }}" {% if multiple %}multiple{% endif %} >
+                <label for="select_file" class="custom-file-label">Select files...</label>
+          </div>
+        </div>
+        <div class="col">
+            <div class="progress">
+                <div class="progress-bar progress-bar-success"></div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+</div>
+{%- endblock upload_media_widget %}

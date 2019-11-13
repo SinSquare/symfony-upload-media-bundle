@@ -1,0 +1,21 @@
+{
+    "name": "app",
+    "version": "1.0.0",
+    "description": "app",
+    "dependencies": {
+        "jquery": "3.4.1",
+        "blueimp-file-upload": "^10.2.0"
+    },
+    "browserslist": [
+        "last 1 version",
+        "not dead"
+    ],
+    "devDependencies": {
+        "del": "4.1.1",
+        "gulp": "4.0.2",
+        "gulp-clean-css": "4.2.0",
+        "gulp-rename": "^1.4.0",
+        "gulp-uglify": "^3.0.2",
+        "merge-stream": "2.0.0"
+    }
+}
