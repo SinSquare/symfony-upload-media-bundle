@@ -4,3 +4,4 @@
 
 php vendor/bin/phpunit
 php vendor/bin/php-cs-fixer fix
+php vendor/bin/phpunit --coverage-html ./var

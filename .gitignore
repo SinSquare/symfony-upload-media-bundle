@@ -1,4 +1,5 @@
 /vendor/
+/var/
 .phpunit
 /phpunit.xml
 composer.lock
