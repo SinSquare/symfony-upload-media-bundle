@@ -46,13 +46,18 @@ build:php73:
     - docker
 
 test:php72_s34:
+  <<: *job_definition
+  script:
+    - test1 project
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
+    SYMFONY_VERSION: 3.4.*
+    
+.test_template: &job_definition
   stage: test
   image: docker:stable
   services:
     - docker:dind
-  variables:
-    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
-    SYMFONY_VERSION: 3.4.*
   script:
     # get test image
     - docker pull $IMAGE_PATH
@@ -72,9 +77,6 @@ test:php72_s34:
     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml down
   tags:
     - docker
-
-
-
 
 
 
