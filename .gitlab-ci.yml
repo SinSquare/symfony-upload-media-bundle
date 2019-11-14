@@ -56,7 +56,7 @@ test:php72_s34:
   script:
     # get test image
     - docker pull $IMAGE_PATH
-    - docker tag $IMAGE_PATH --tag test_image
+    - docker tag $IMAGE_PATH test_image
     # install docker compose
     - apk add --update python py-pip python-dev && pip install --quiet docker-compose~=1.23.0
     - docker-compose version
