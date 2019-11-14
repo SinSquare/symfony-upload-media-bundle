@@ -9,7 +9,7 @@ with open(path+'/../../composer.json', 'r+') as f:
     data = json.load(f)
 
 for key in data['require']:
-    if key.startswith('ymfony/'):
+    if key.startswith('symfony/'):
         data['require'][key] = sys.argv[1]
 
 with open(path+'/../../custom_composer.json', 'w') as outfile:

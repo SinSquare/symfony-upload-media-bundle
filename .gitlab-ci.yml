@@ -62,13 +62,9 @@ test:php72_s34:
     - docker-compose version
     # create custom composer file
     - python Resources/gitlab_ci/create_composer.py $SYMFONY_VERSION
-    - rm composer.json
-    - ls -la
-    - cat custom_composer.json
     # start containers
     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml up -d
     # init
-    - docker exec -w /code php_test_image cat custom_composer.json
     - docker exec -w /code -e COMPOSER=custom_composer.json php_test_image composer install --prefer-dist --no-suggest --no-progress
     # testing
     - docker exec -w /code php_test_image php vendor/bin/phpunit

@@ -7,5 +7,3 @@ services:
     volumes:
       - ../../:/code
       - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
-    environment:
-      - COMPOSER=custom_composer.json
