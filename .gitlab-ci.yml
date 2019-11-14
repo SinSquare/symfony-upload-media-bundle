@@ -65,7 +65,7 @@ test:php72_s34:
     # start containers
     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml up -d
     # init
-    - docker exec -w /code -e COMPOSER=custom_composer.json $(docker ps --filter "name=php" --format "{{.ID}}") composer install --prefer-dist
+    - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") composer install --prefer-dist --no-suggest --no-progress
     # testing
     - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") php vendor/bin/phpunit
     # stopping container
