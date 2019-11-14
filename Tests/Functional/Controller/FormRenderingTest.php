@@ -15,7 +15,7 @@ use UploadMediaBundle\Tests\Functional\BaseTestCase;
 
 class FormRenderingTest extends BaseTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->kernel->boot();

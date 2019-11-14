@@ -5,3 +5,4 @@ services:
     image: test_image
     volumes:
       - ../../:/code
+      - ./php.ini:/usr/local/etc/php/conf.d/custom.ini

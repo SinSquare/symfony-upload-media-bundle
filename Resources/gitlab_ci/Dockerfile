@@ -10,21 +10,26 @@ RUN buildDeps=" \
     runtimeDeps=" \
         curl \
         git \
+        libicu-dev \
         libpq-dev \
         libxml2-dev \
         gnupg2 \
         unzip \
         libzip-dev \
+        sqlite3 \
+        libgmp-dev \
     " \
     && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y $buildDeps $runtimeDeps \
     && docker-php-ext-install bcmath bz2 calendar iconv intl mbstring zip \
-    && apt-get -y install libgmp-dev \
     && docker-php-ext-configure gmp \
     && docker-php-ext-install gmp \
+    && docker-php-ext-install opcache && docker-php-ext-configure opcache --enable-opcache \
+    && pecl install -o ds \
+    && docker-php-ext-enable ds \
     && apt-get purge -y --auto-remove $buildDeps \
     && rm -r /var/lib/apt/lists/*
-    
-RUN if [ "$WITH_XDEBUG" = "true" ] ; then yes | pecl install xdebug && docker-php-ext-enable xdebug; fi 
+
+RUN pecl install pcov && docker-php-ext-enable pcov
 
 RUN usermod -u 1000 www-data
 

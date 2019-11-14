@@ -33,9 +33,14 @@ test:
     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml up -d
     # init
     - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") composer install --prefer-dist
+    - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") composer dump-autoload --optimize --classmap-authoritative
     # testing
-    - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") php vendor/bin/phpunit --coverage-text --colors=never
+    - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") php vendor/bin/phpunit
     # stopping container
     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml down
   tags:
     - docker
+  artifacts:
+    paths:
+      - var/phpunit
+    expire_in: 2 days
