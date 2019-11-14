@@ -12,35 +12,127 @@ before_script:
   - docker version
 
 stages:
+  - build
   - test
 
-test:
+build:php72:
+  stage: build
+  image: docker:stable
+  services:
+    - docker:dind
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
+  script:
+    # build test image
+    - sh Resources/gitlab_ci/pull_cache.sh "$CI_COMMIT_MESSAGE" "$IMAGE_PATH"
+    - docker build --build-arg PHP_VERSION=php:7.2-fpm  --cache-from $IMAGE_PATH --tag $IMAGE_PATH --tag php72 -f ./Resources/gitlab_ci/Dockerfile .
+    - docker push $IMAGE_PATH
+  tags:
+    - docker
+
+build:php73:
+  stage: build
+  image: docker:stable
+  services:
+    - docker:dind
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
+  script:
+    # build test image
+    - sh Resources/gitlab_ci/pull_cache.sh "$CI_COMMIT_MESSAGE" "$IMAGE_PATH"
+    - docker build --build-arg PHP_VERSION=php:7.3-fpm  --cache-from $IMAGE_PATH --tag $IMAGE_PATH --tag php73 -f ./Resources/gitlab_ci/Dockerfile .
+    - docker push $IMAGE_PATH
+  tags:
+    - docker
+
+test:php72_s34:
   stage: test
   image: docker:stable
   services:
     - docker:dind
   variables:
-    IMAGE_PATH: $CI_REGISTRY_IMAGE:test_image
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
+    SYMFONY_VERSION: 3.4.*
   script:
-    # build test image
-    - sh Resources/gitlab_ci/pull_cache.sh "$CI_COMMIT_MESSAGE" "$IMAGE_PATH"
-    - docker build --cache-from $IMAGE_PATH --tag $IMAGE_PATH --tag test_image -f ./Resources/gitlab_ci/Dockerfile .
-    - docker push $IMAGE_PATH
+    # get test image
+    - docker pull $IMAGE_PATH
+    - docker tag $IMAGE_PATH --tag test_image
     # install docker compose
     - apk add --update python py-pip python-dev && pip install --quiet docker-compose~=1.23.0
     - docker-compose version
+    # create composer file
+    - python Resources/gitlab_ci/create_composer.py $SYMFONY_VERSION
     # start containers
     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml up -d
     # init
-    - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") composer install --prefer-dist
-    - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") composer dump-autoload --optimize --classmap-authoritative
-    # testing
+    - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") COMPOSER=custom_composer.json composer install --prefer-dist    # testing
     - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") php vendor/bin/phpunit
     # stopping container
     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml down
   tags:
     - docker
-  artifacts:
-    paths:
-      - var/phpunit
-    expire_in: 2 days
+
+
+
+
+
+
+
+
+
+
+# test:php72_s40:
+
+# test:php72_s41:
+
+# test:php72_s43:
+
+# test:php72_s44:
+
+# test:php73_s34:
+
+# test:php73_s40:
+
+# test:php73_s41:
+
+# test:php73_s43:
+
+# test:php73_s44:
+
+
+
+
+
+
+
+
+# test:
+#   stage: test
+#   image: docker:stable
+#   services:
+#     - docker:dind
+#   variables:
+#     IMAGE_PATH: $CI_REGISTRY_IMAGE:test_image
+#   script:
+#     # build test image
+#     - sh Resources/gitlab_ci/pull_cache.sh "$CI_COMMIT_MESSAGE" "$IMAGE_PATH"
+#     - docker build --cache-from $IMAGE_PATH --tag $IMAGE_PATH --tag test_image -f ./Resources/gitlab_ci/Dockerfile .
+#     - docker push $IMAGE_PATH
+#     # install docker compose
+#     - apk add --update python py-pip python-dev && pip install --quiet docker-compose~=1.23.0
+#     - docker-compose version
+#     # start containers
+#     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml up -d
+#     # init
+#     - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") composer install --prefer-dist
+#     - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") composer dump-autoload --optimize --classmap-authoritative
+#     # testing
+#     - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") php vendor/bin/phpunit
+#     # stopping container
+#     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml down
+#   tags:
+#     - docker
+#   artifacts:
+#     paths:
+#       - var/phpunit
+#     expire_in: 2 days

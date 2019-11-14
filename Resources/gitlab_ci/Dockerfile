@@ -1,4 +1,5 @@
-FROM php:7.3-fpm
+ARG PHP_VERSION=php:7.3-fpm
+FROM $MYAPP_IMAGE
 
 # Install PHP extensions and PECL modules.
 RUN buildDeps=" \
