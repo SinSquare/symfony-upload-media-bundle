@@ -76,65 +76,85 @@ test:php72_s34:
     IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
     SYMFONY_VERSION: 3.4.*
 
+test:php72_s40:
+  <<: *job_definition
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
+    SYMFONY_VERSION: 4.0.*
 
+test:php72_s41:
+  <<: *job_definition
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
+    SYMFONY_VERSION: 4.1.*
 
+test:php72_s42:
+  <<: *job_definition
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
+    SYMFONY_VERSION: 4.2.*
 
+test:php72_s43:
+  <<: *job_definition
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
+    SYMFONY_VERSION: 4.3.*
 
+test:php73_s34:
+  <<: *job_definition
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
+    SYMFONY_VERSION: 3.4.*
 
+test:php73_s40:
+  <<: *job_definition
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
+    SYMFONY_VERSION: 4.0.*
 
+test:php73_s41:
+  <<: *job_definition
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
+    SYMFONY_VERSION: 4.1.*
 
-# test:php72_s40:
+test:php73_s42:
+  <<: *job_definition
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
+    SYMFONY_VERSION: 4.2.*
 
-# test:php72_s41:
+test:php73_s43:
+  <<: *job_definition
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
+    SYMFONY_VERSION: 4.3.*
 
-# test:php72_s43:
-
-# test:php72_s44:
-
-# test:php73_s34:
-
-# test:php73_s40:
-
-# test:php73_s41:
-
-# test:php73_s43:
-
-# test:php73_s44:
-
-
-
-
-
-
-
-
-# test:
-#   stage: test
-#   image: docker:stable
-#   services:
-#     - docker:dind
-#   variables:
-#     IMAGE_PATH: $CI_REGISTRY_IMAGE:test_image
-#   script:
-#     # build test image
-#     - sh Resources/gitlab_ci/pull_cache.sh "$CI_COMMIT_MESSAGE" "$IMAGE_PATH"
-#     - docker build --cache-from $IMAGE_PATH --tag $IMAGE_PATH --tag test_image -f ./Resources/gitlab_ci/Dockerfile .
-#     - docker push $IMAGE_PATH
-#     # install docker compose
-#     - apk add --update python py-pip python-dev && pip install --quiet docker-compose~=1.23.0
-#     - docker-compose version
-#     # start containers
-#     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml up -d
-#     # init
-#     - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") composer install --prefer-dist
-#     - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") composer dump-autoload --optimize --classmap-authoritative
-#     # testing
-#     - docker exec -w /code $(docker ps --filter "name=php" --format "{{.ID}}") php vendor/bin/phpunit
-#     # stopping container
-#     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml down
-#   tags:
-#     - docker
-#   artifacts:
-#     paths:
-#       - var/phpunit
-#     expire_in: 2 days
+test:php73_laters:
+  stage: test
+  image: docker:stable
+  services:
+    - docker:dind
+  variables:
+    IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
+  script:
+    # get test image
+    - docker pull $IMAGE_PATH
+    - docker tag $IMAGE_PATH test_image
+    # install docker compose
+    - apk add --update python py-pip python-dev && pip install --quiet docker-compose~=1.23.0
+    - docker-compose version
+    # start containers
+    - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml up -d
+    # init
+    - docker exec -w /code php_test_image composer install --prefer-dist --no-suggest --no-progress
+    # testing
+    - docker exec -w /code php_test_image php vendor/bin/phpunit
+    # stopping container
+    - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml down
+  tags:
+    - docker
+  artifacts:
+    paths:
+      - var/phpunit
+    expire_in: 2 days
