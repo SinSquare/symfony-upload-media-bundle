@@ -72,8 +72,6 @@ build:php73:
 
 test:php72_s34:
   <<: *job_definition
-  script:
-    - test1 project
   variables:
     IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
     SYMFONY_VERSION: 3.4.*
