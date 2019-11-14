@@ -24,7 +24,7 @@ test:
   script:
     # build test image
     - sh Resources/gitlab_ci/pull_cache.sh "$CI_COMMIT_MESSAGE" "$IMAGE_PATH"
-    - docker build --build-arg WITH_XDEBUG=true --cache-from $IMAGE_PATH --tag $IMAGE_PATH --tag test_image -f ./Resources/gitlab_ci/Dockerfile .
+    - docker build --cache-from $IMAGE_PATH --tag $IMAGE_PATH --tag test_image -f ./Resources/gitlab_ci/Dockerfile .
     - docker push $IMAGE_PATH
     # install docker compose
     - apk add --update python py-pip python-dev && pip install --quiet docker-compose~=1.23.0
