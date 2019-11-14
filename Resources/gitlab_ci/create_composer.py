@@ -12,5 +12,5 @@ for key in data['require']:
     if key.startswith('ymfony/'):
         data['require'][key] = sys.argv[1]
 
-with open(path+'/../../composer.json', 'w') as outfile:
+with open(path+'/../../custom_composer.json', 'w') as outfile:
     json.dump(data, outfile, indent=4)
