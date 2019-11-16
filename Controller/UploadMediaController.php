@@ -73,7 +73,7 @@ class UploadMediaController extends AbstractController
         }
 
         $getFilesEvent = new GetUploadedFilesEvent($request);
-        $dispatcher->dispatch($getFilesEvent, UploadMediaEvents::GETFILES);
+        EventDispatcherHelper::dispatch($dispatcher, $getFilesEvent, UploadMediaEvents::GETFILES);
         $files = $getFilesEvent->getUploadedFiles();
 
         if (0 === \count($files)) {
@@ -101,7 +101,7 @@ class UploadMediaController extends AbstractController
         }
 
         $responseEvent = new GetResponseEvent($files, $request, $response, $chunked);
-        $dispatcher->dispatch($responseEvent, UploadMediaEvents::RESPONSE);
+        EventDispatcherHelper::dispatch($dispatcher, $responseEvent, UploadMediaEvents::RESPONSE);
 
         return $responseEvent->getResponse();
     }
@@ -127,7 +127,7 @@ class UploadMediaController extends AbstractController
 
         //modify/move the file
         $uploadEvent = new UploadedEvent($file, $request);
-        $dispatcher->dispatch($uploadEvent, UploadMediaEvents::UPLOAD);
+        EventDispatcherHelper::dispatch($dispatcher, $uploadEvent, UploadMediaEvents::UPLOAD);
         $file = $uploadEvent->getUploadedFile();
 
         if (!$uploadEvent->getIsMoved()) {
@@ -140,7 +140,7 @@ class UploadMediaController extends AbstractController
         $data['path'] = $file->getPathname();
 
         $dataEvent = new GetFileDataEvent($file, $request, $data);
-        $dispatcher->dispatch($dataEvent, UploadMediaEvents::FILEDATA);
+        EventDispatcherHelper::dispatch($dispatcher, $dataEvent, UploadMediaEvents::FILEDATA);
 
         return $dataEvent->getData();
     }
@@ -165,7 +165,7 @@ class UploadMediaController extends AbstractController
 
         //decide if the uploaded file should be kept
         $keepfileEvent = new KeepfileEvent($file, $request);
-        $dispatcher->dispatch($keepfileEvent, UploadMediaEvents::KEEPFILE);
+        EventDispatcherHelper::dispatch($dispatcher, $keepfileEvent, UploadMediaEvents::KEEPFILE);
 
         if (false === $keepfileEvent->getKeepFile()) {
             return null;
@@ -186,19 +186,19 @@ class UploadMediaController extends AbstractController
             $file = $this->mergeChunks($uploadedMediaDirectory, $chunkBaseName, $newName, $size);
 
             $uploadEvent = new UploadedEvent($file, $request);
-            $dispatcher->dispatch($uploadEvent, UploadMediaEvents::UPLOAD);
+            EventDispatcherHelper::dispatch($dispatcher, $uploadEvent, UploadMediaEvents::UPLOAD);
             $file = $uploadEvent->getUploadedFile();
 
             $data['path'] = $file->getPathname();
 
             $dataEvent = new GetFileDataEvent($file, $request, $data);
-            $dispatcher->dispatch($dataEvent, UploadMediaEvents::FILEDATA);
+            EventDispatcherHelper::dispatch($dispatcher, $dataEvent, UploadMediaEvents::FILEDATA);
 
             return $dataEvent->getData();
         }
 
         $dataEvent = new GetChunkDataEvent($file, $request, $data);
-        $dispatcher->dispatch($dataEvent, UploadMediaEvents::CHUNKDATA);
+        EventDispatcherHelper::dispatch($dispatcher, $dataEvent, UploadMediaEvents::CHUNKDATA);
 
         return $dataEvent->getData();
     }

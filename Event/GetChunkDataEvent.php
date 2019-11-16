@@ -14,10 +14,6 @@ namespace UploadMediaBundle\Event;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 
-if (!class_exists('Symfony\Contracts\EventDispatcher\Event')) {
-    @class_alias('Symfony\Contracts\EventDispatcher\Event', 'Symfony\Component\EventDispatcher\Event');
-}
-
 class GetChunkDataEvent extends GetFileDataEvent
 {
     public function __construct(File $uploadedFile, Request $request, array $data)

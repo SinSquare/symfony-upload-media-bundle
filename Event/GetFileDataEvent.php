@@ -11,13 +11,9 @@
 
 namespace UploadMediaBundle\Event;
 
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Contracts\EventDispatcher\Event;
-
-if (!class_exists('Symfony\Contracts\EventDispatcher\Event')) {
-    @class_alias('Symfony\Contracts\EventDispatcher\Event', 'Symfony\Component\EventDispatcher\Event');
-}
 
 class GetFileDataEvent extends Event
 {

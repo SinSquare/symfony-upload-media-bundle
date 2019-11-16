@@ -18,7 +18,12 @@ class EventDispatcherHelper
 {
     private static $dispatcherArgNum;
 
-    public static function dispatch(EventDispatcherInterface $dispatcher, Event $event, string $eventName)
+    /**
+     * Helper to decide the argument format of the EventDispatcher
+     * old format: $eventName, $event
+     * new form: $event, ($eventName).
+     */
+    public static function dispatch(EventDispatcherInterface $dispatcher, $event, string $eventName)
     {
         if (null === self::$dispatcherArgNum) {
             $class = \get_class($dispatcher);
