@@ -47,30 +47,7 @@ class UploadMediaController extends AbstractController
             throw new \RuntimeException(sprintf("The upload path '%s' exists, but is not a directory or is not writable", $uploadedMediaDirectory));
         }
 
-        $from = null;
-        $to = null;
-        $size = null;
-
-        if ($request->headers->has('Content-Range')) {
-            $rangeInfo = $request->headers->get('Content-Range');
-            preg_match(
-                '/(?P<from>[0-9]+)-(?P<to>[0-9]+)\/(?P<size>[0-9]+)/',
-                $rangeInfo,
-                $matches
-            );
-
-            if (!isset($matches['from']) || !isset($matches['to']) || !isset($matches['size'])) {
-                throw new \RuntimeException(sprintf("Content-Range header with value '%s' is invalid", $rangeInfo));
-            }
-
-            $from = (int) ($matches['from']);
-            $to = (int) ($matches['to']);
-            $size = (int) ($matches['size']);
-
-            if ($from < 0 || $to < $from || $size < 1) {
-                throw new \RuntimeException(sprintf("Content-Range header with value '%s' is invalid", $rangeInfo));
-            }
-        }
+        list($from, $to, $size) = $this->getContentRange($request);
 
         $getFilesEvent = new GetUploadedFilesEvent($request);
         EventDispatcherHelper::dispatch($dispatcher, $getFilesEvent, UploadMediaEvents::GETFILES);
@@ -151,16 +128,7 @@ class UploadMediaController extends AbstractController
      */
     protected function uploadChunk(UploadedFile $file, Request $request, EventDispatcherInterface $dispatcher, string $uploadedMediaDirectory): ?array
     {
-        preg_match(
-            '/(?P<from>[0-9]+)-(?P<to>[0-9]+)\/(?P<size>[0-9]+)/',
-            $request->headers->get('Content-Range'),
-            $matches
-        );
-
-        $from = (int) ($matches['from']);
-        $to = (int) ($matches['to']);
-        $size = (int) ($matches['size']);
-
+        list($from, $to, $size) = $this->getContentRange($request);
         $isLast = $to >= $size - 1;
 
         //decide if the uploaded file should be kept
@@ -257,22 +225,58 @@ class UploadMediaController extends AbstractController
     /**
      * Get unique name for single-file upload. It will generate new name if the filename exists.
      */
-    protected function getUniqueName(string $uploadedMediaDirectory, string $originalName, ?string $ext)
+    protected function getUniqueName(string $uploadedMediaDirectory, string $originalName, string $ext = null)
     {
         $cnt = 0;
+        $additionalStr = '';
         do {
             ++$cnt;
-            $newName = sha1(uniqid($originalName, true).(string) microtime(true));
+            $newName = sha1($originalName.$additionalStr);
             if (!empty($ext)) {
                 $newName .= '.'.$ext;
             }
 
-            $path = sprintf('%s/%s', $uploadedMediaDirectory, $newName);
+            $path = sprintf('%s%s%s', $uploadedMediaDirectory, \DIRECTORY_SEPARATOR, $newName);
             if (!file_exists($path)) {
                 return $newName;
             }
-        } while ($cnt <= 10);
+            $additionalStr .= uniqid(microtime(true));
+        } while ($cnt <= 3);
 
+        // @codeCoverageIgnoreStart
         throw new \RuntimeException('Could not create unique name for file');
+        // @codeCoverageIgnoreEnd
+    }
+
+    protected function getContentRange(Request $request): ?array
+    {
+        $from = null;
+        $to = null;
+        $size = null;
+
+        if ($request->headers->has('Content-Range')) {
+            $rangeInfo = $request->headers->get('Content-Range');
+            preg_match(
+                '/(?P<from>[0-9]+)-(?P<to>[0-9]+)\/(?P<size>[0-9]+)/',
+                $rangeInfo,
+                $matches
+            );
+
+            if (!isset($matches['from']) || !isset($matches['to']) || !isset($matches['size'])) {
+                throw new \RuntimeException(sprintf("Content-Range header with value '%s' is invalid", $rangeInfo));
+            }
+
+            $from = (int) ($matches['from']);
+            $to = (int) ($matches['to']);
+            $size = (int) ($matches['size']);
+
+            if ($from < 0 || $to < $from || $to >= $size || $size < 1) {
+                throw new \RuntimeException(sprintf("Content-Range header with value '%s' is invalid", $rangeInfo));
+            }
+
+            return [$from, $to, $size];
+        }
+
+        return null;
     }
 }

@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractEventTest extends TestCase
 {
+    protected static $uploadedFileArgs;
+
     protected function createFile(int $length = 128)
     {
         $path = sys_get_temp_dir().\DIRECTORY_SEPARATOR.sha1(uniqid('path', true).(string) microtime(true));
@@ -25,25 +27,21 @@ abstract class AbstractEventTest extends TestCase
         return $path;
     }
 
-    protected function createUploadedFile(int $length = 128, string $originalName = null, string $mimeType = 'text/plain'): UploadedFile
+    protected function createUploadedFileInstance(string $path, string $originalName, string $mimeType = null): UploadedFile
     {
-        if (null === $originalName) {
-            $originalName = sha1(uniqid('originalName').(string) microtime(true));
+        if (null === self::$uploadedFileArgs) {
+            $reflectionClass = new \ReflectionClass(UploadedFile::class);
+            $method = $reflectionClass->getMethod('__construct');
+            self::$uploadedFileArgs = $method->getNumberOfParameters();
         }
 
-        $path = $this->createFile($length);
-
-        $reflectionClass = new \ReflectionClass(UploadedFile::class);
-        $method = $reflectionClass->getMethod('__construct');
-        $num = $method->getNumberOfParameters();
-
-        if ($num > 5) {
+        if (self::$uploadedFileArgs > 5) {
             //old
             $f = new UploadedFile(
                 $path,
                 $originalName,
                 $mimeType,
-                $length,
+                filesize($path),
                 null,
                 true
             );
@@ -59,6 +57,37 @@ abstract class AbstractEventTest extends TestCase
         }
 
         return $f;
+    }
+
+    protected function createUploadedFile(int $length = 128, string $originalName = null, string $mimeType = 'text/plain'): UploadedFile
+    {
+        if (null === $originalName) {
+            $originalName = sha1(uniqid('originalName').(string) microtime(true));
+        }
+
+        $path = $this->createFile($length);
+
+        $reflectionClass = new \ReflectionClass(UploadedFile::class);
+        $method = $reflectionClass->getMethod('__construct');
+        $num = $method->getNumberOfParameters();
+
+        return $this->createUploadedFileInstance($path, $originalName, $mimeType);
+    }
+
+    protected function createUploadedFileChunk(UploadedFile $file, int $from, int $to): UploadedFile
+    {
+        $dir = sys_get_temp_dir();
+        $name = 'part_'.sha1(uniqid('part_', true));
+        $path = $dir.\DIRECTORY_SEPARATOR.$name;
+
+        $handle = fopen($file->getRealPath(), 'r');
+        fseek($handle, $from);
+        $content = fread($handle, $to - $from);
+        fclose($handle);
+
+        file_put_contents($path, $content);
+
+        return $this->createUploadedFileInstance($path, $file->getClientOriginalName(), $file->getClientMimeType());
     }
 
     protected function createRequest(int $numberOfFiles = 1): Request

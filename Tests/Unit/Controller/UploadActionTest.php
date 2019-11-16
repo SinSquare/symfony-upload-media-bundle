@@ -12,10 +12,11 @@
 namespace UploadMediaBundle\Tests\Unit\DataClass;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use UploadMediaBundle\Controller\UploadMediaController;
 use UploadMediaBundle\Tests\Unit\AbstractEventTest;
 
-class UploadMediaControllerTest extends AbstractEventTest
+class UploadActionTest extends AbstractEventTest
 {
     public function testUploadFile()
     {
@@ -29,12 +30,7 @@ class UploadMediaControllerTest extends AbstractEventTest
 
         $this->assertSame(0, $this->countFilesInDir($dir));
 
-        $data = $this->invokeMethod($controller, 'uploadFile', [$file, $request, $dispatcher, $dir]);
-        $this->assertIsArray($data);
-
-        $this->assertSame('testfile_0', $data['originalName']);
-        $this->assertSame('text/plain', $data['mimeType']);
-        $this->assertSame('txt', $data['extension']);
-        $this->assertSame(0, mb_strpos($data['path'], $dir));
+        $response = $this->invokeMethod($controller, 'uploadAction', [$request, $dispatcher, $dir]);
+        $this->assertInstanceOf(JsonResponse::class, $response);
     }
 }
