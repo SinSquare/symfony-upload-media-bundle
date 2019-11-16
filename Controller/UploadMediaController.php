@@ -19,10 +19,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use UploadMediaBundle\Event\GetChunkDataEvent;
+use UploadMediaBundle\Event\GetFileDataEvent;
 use UploadMediaBundle\Event\GetResponseEvent;
+use UploadMediaBundle\Event\GetUploadedFilesEvent;
 use UploadMediaBundle\Event\KeepfileEvent;
 use UploadMediaBundle\Event\UploadedEvent;
 use UploadMediaBundle\Event\UploadMediaEvents;
+use UploadMediaBundle\Helper\EventDispatcherHelper;
 
 class UploadMediaController extends AbstractController
 {
@@ -68,61 +72,84 @@ class UploadMediaController extends AbstractController
             }
         }
 
+        $getFilesEvent = new GetUploadedFilesEvent($request);
+        $dispatcher->dispatch($getFilesEvent, UploadMediaEvents::GETFILES);
+        $files = $getFilesEvent->getUploadedFiles();
+
+        if (0 === \count($files)) {
+            return new JsonResponse(['data' => []]);
+        }
+
         if ((null === $from && null === $to && null === $size) || (0 === $from && $to >= $size - 1)) {
-            return $this->uploadSingleFile($request, $dispatcher, $uploadedMediaDirectory);
+            //non-chunked upload
+            $data = [];
+            foreach ($files as $file) {
+                $data[] = $this->uploadFile($file, $request, $dispatcher, $uploadedMediaDirectory);
+            }
+
+            $response = new JsonResponse(['data' => $data]);
+            $chunked = false;
+        } else {
+            if (\count($files) > 1) {
+                throw new \RuntimeException(sprintf('Only 1 file is supported for chunked-upload, but the request contains %d files', \count($files)));
+            }
+
+            $data = $this->uploadChunk(array_pop($files), $request, $dispatcher, $uploadedMediaDirectory);
+
+            $response = new JsonResponse(['data' => [$data]]);
+            $chunked = true;
         }
 
-        return $this->uploadChunk($request, $dispatcher, $uploadedMediaDirectory);
-    }
-
-    /**
-     * Manage the upload of a single-file upload.
-     */
-    protected function uploadSingleFile(Request $request, EventDispatcherInterface $dispatcher, string $uploadedMediaDirectory): Response
-    {
-        $data = [];
-
-        $file = $this->getFirstFileFromRequest($request);
-
-        $keepfileEvent = new KeepfileEvent($file, $request);
-        $dispatcher->dispatch($keepfileEvent, UploadMediaEvents::KEEPFILE);
-
-        if (false === $keepfileEvent->getKeepFile()) {
-            return new JsonResponse(['data' => $data]);
-        }
-
-        $originalName = $file->getClientOriginalName();
-        $mime = $file->getClientMimeType();
-        $ext = $file->guessClientExtension();
-
-        $newName = $this->getUniqueName($uploadedMediaDirectory, $originalName, $ext);
-
-        $file = $file->move($uploadedMediaDirectory, $newName);
-
-        $uploadEvent = new UploadedEvent($file, $request);
-        $dispatcher->dispatch($uploadEvent, UploadMediaEvents::UPLOAD);
-
-        $file = $uploadEvent->getUploadedFile();
-
-        $d = [
-            'path' => $file->getPathname(),
-            'originalName' => $originalName,
-            'mimeType' => $mime,
-            'ext' => $ext,
-        ];
-
-        $response = new JsonResponse(['data' => $d]);
-        $responseEvent = new GetResponseEvent($file, $request, $response);
+        $responseEvent = new GetResponseEvent($files, $request, $response, $chunked);
         $dispatcher->dispatch($responseEvent, UploadMediaEvents::RESPONSE);
 
         return $responseEvent->getResponse();
     }
 
     /**
+     * Manage the upload of non-chunked file(s).
+     */
+    protected function uploadFile(UploadedFile $file, Request $request, EventDispatcherInterface $dispatcher, string $uploadedMediaDirectory): ?array
+    {
+        //decide if the uploaded file should be kept
+        $keepfileEvent = new KeepfileEvent($file, $request);
+        EventDispatcherHelper::dispatch($dispatcher, $keepfileEvent, UploadMediaEvents::KEEPFILE);
+
+        if (false === $keepfileEvent->getKeepFile()) {
+            return null;
+        }
+
+        $data = $keepfileEvent->getData();
+
+        //get basic data
+        $originalName = $file->getClientOriginalName();
+        $ext = $file->guessClientExtension();
+
+        //modify/move the file
+        $uploadEvent = new UploadedEvent($file, $request);
+        $dispatcher->dispatch($uploadEvent, UploadMediaEvents::UPLOAD);
+        $file = $uploadEvent->getUploadedFile();
+
+        if (!$uploadEvent->getIsMoved()) {
+            //if the file was not moved, move to uploadedMediaDirectory with a unique name
+            //othervise it would be deleted
+            $newName = $this->getUniqueName($uploadedMediaDirectory, $originalName, $ext);
+            $file = $file->move($uploadedMediaDirectory, $newName);
+        }
+
+        $data['path'] = $file->getPathname();
+
+        $dataEvent = new GetFileDataEvent($file, $request, $data);
+        $dispatcher->dispatch($dataEvent, UploadMediaEvents::FILEDATA);
+
+        return $dataEvent->getData();
+    }
+
+    /**
      * Manage the upload of a chunked file upload
      * Also it merges the parts if all the parts are uploaded.
      */
-    protected function uploadChunk(Request $request, EventDispatcherInterface $dispatcher, string $uploadedMediaDirectory): Response
+    protected function uploadChunk(UploadedFile $file, Request $request, EventDispatcherInterface $dispatcher, string $uploadedMediaDirectory): ?array
     {
         preg_match(
             '/(?P<from>[0-9]+)-(?P<to>[0-9]+)\/(?P<size>[0-9]+)/',
@@ -130,25 +157,23 @@ class UploadMediaController extends AbstractController
             $matches
         );
 
-        $data = [];
-
         $from = (int) ($matches['from']);
         $to = (int) ($matches['to']);
         $size = (int) ($matches['size']);
 
         $isLast = $to >= $size - 1;
 
-        $file = $this->getFirstFileFromRequest($request);
-
+        //decide if the uploaded file should be kept
         $keepfileEvent = new KeepfileEvent($file, $request);
         $dispatcher->dispatch($keepfileEvent, UploadMediaEvents::KEEPFILE);
 
         if (false === $keepfileEvent->getKeepFile()) {
-            return new JsonResponse(['data' => $data]);
+            return null;
         }
 
+        $data = $keepfileEvent->getData();
+
         $originalName = $file->getClientOriginalName();
-        $mime = $file->getClientMimeType();
         $ext = $file->guessClientExtension();
 
         $chunkBaseName = $this->getMultipartUniqueName($uploadedMediaDirectory, $originalName);
@@ -162,26 +187,20 @@ class UploadMediaController extends AbstractController
 
             $uploadEvent = new UploadedEvent($file, $request);
             $dispatcher->dispatch($uploadEvent, UploadMediaEvents::UPLOAD);
-
             $file = $uploadEvent->getUploadedFile();
 
-            $d = [
-                'path' => $file->getPathname(),
-                'originalName' => $originalName,
-                'mimeType' => $mime,
-                'ext' => $ext,
-            ];
+            $data['path'] = $file->getPathname();
 
-            $response = new JsonResponse(['data' => $d]);
-            $responseEvent = new GetResponseEvent($file, $request, $response);
-            $dispatcher->dispatch($responseEvent, UploadMediaEvents::RESPONSE);
+            $dataEvent = new GetFileDataEvent($file, $request, $data);
+            $dispatcher->dispatch($dataEvent, UploadMediaEvents::FILEDATA);
 
-            $response = $responseEvent->getResponse();
-        } else {
-            $response = new JsonResponse(['data' => []]);
+            return $dataEvent->getData();
         }
 
-        return $response;
+        $dataEvent = new GetChunkDataEvent($file, $request, $data);
+        $dispatcher->dispatch($dataEvent, UploadMediaEvents::CHUNKDATA);
+
+        return $dataEvent->getData();
     }
 
     /**
@@ -201,8 +220,6 @@ class UploadMediaController extends AbstractController
         };
 
         $finder->sort($sort);
-
-        //TODO check all chunk exists
 
         $newFilePath = $uploadedMediaDirectory.\DIRECTORY_SEPARATOR.$newName;
         $out = fopen($newFilePath, 'w');
@@ -225,34 +242,6 @@ class UploadMediaController extends AbstractController
         }
 
         return new File($newFilePath);
-    }
-
-    /**
-     * Get the UploadedFile from the request. Only 1 file is supported.
-     */
-    protected function getFirstFileFromRequest(Request $request): UploadedFile
-    {
-        $allFiles = [];
-
-        foreach ($request->files->all() as $key => $files) {
-            if (\is_array($files)) {
-                foreach ($files as $file) {
-                    if ($file instanceof UploadedFile) {
-                        $allFiles[] = $file;
-                    }
-                }
-            } elseif ($files instanceof UploadedFile) {
-                $allFiles[] = $files;
-            }
-        }
-
-        if (\count($files) > 1) {
-            throw new \RuntimeException('Request contains more than 1 file');
-        } elseif (0 === \count($files)) {
-            throw new \RuntimeException('Could not find UploadedFile in the request');
-        }
-
-        return array_pop($files);
     }
 
     /**

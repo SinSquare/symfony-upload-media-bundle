@@ -15,12 +15,18 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
+if (!class_exists('Symfony\Contracts\EventDispatcher\Event')) {
+    @class_alias('Symfony\Contracts\EventDispatcher\Event', 'Symfony\Component\EventDispatcher\Event');
+}
+
 class UploadedEvent extends Event
 {
+    protected $isMoved;
     protected $uploadedFile;
 
     public function __construct(File $uploadedFile, Request $request)
     {
+        $this->isMoved = false;
         $this->uploadedFile = $uploadedFile;
         $this->request = $request;
     }
@@ -33,5 +39,19 @@ class UploadedEvent extends Event
     public function getUploadedFile(): File
     {
         return $this->uploadedFile;
+    }
+
+    public function move($directory, $name = null): File
+    {
+        $newFile = $this->uploadedFile->move($directory, $name);
+        $this->uploadedFile = $newFile;
+        $this->isMoved = true;
+
+        return $newFile;
+    }
+
+    public function getIsMoved(): bool
+    {
+        return $this->isMoved;
     }
 }

@@ -11,22 +11,27 @@
 
 namespace UploadMediaBundle\Event;
 
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\Event;
 
+if (!class_exists('Symfony\Contracts\EventDispatcher\Event')) {
+    @class_alias('Symfony\Contracts\EventDispatcher\Event', 'Symfony\Component\EventDispatcher\Event');
+}
+
 class GetResponseEvent extends Event
 {
     protected $request;
-    protected $uploadedFile;
+    protected $uploadedFiles;
     protected $response;
+    protected $chunked;
 
-    public function __construct(File $uploadedFile, Request $request, Response $response)
+    public function __construct(array $uploadedFiles, Request $request, Response $response, bool $chunked = false)
     {
-        $this->uploadedFile = $uploadedFile;
+        $this->uploadedFiles = $uploadedFiles;
         $this->request = $request;
         $this->response = $response;
+        $this->chunked = $chunked;
     }
 
     public function getRequest(): Request
@@ -34,13 +39,24 @@ class GetResponseEvent extends Event
         return $this->request;
     }
 
-    public function getUploadedFile(): File
+    public function getUploadedFiles(): array
     {
-        return $this->uploadedFile;
+        return $this->uploadedFiles;
     }
 
     public function getResponse(): Response
     {
         return $this->response;
+    }
+
+    public function setResponse(Response $response)
+    {
+        $this->response = $response;
+        $this->stopPropagation();
+    }
+
+    public function getChunked(): bool
+    {
+        return $this->chunked;
     }
 }

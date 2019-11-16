@@ -130,7 +130,7 @@ test:php73_s43:
     IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
     SYMFONY_VERSION: 4.3.*
 
-test:php73_laters:
+test:php73_latest:
   stage: test
   image: docker:stable
   services:

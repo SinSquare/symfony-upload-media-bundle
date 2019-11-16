@@ -130,7 +130,7 @@ class FormRenderingTest extends BaseTestCase
 
         $arr = $arr[0];
 
-        $this->assertContains('resources/testfile1.txt', $arr['path']);
+        $this->assertStringContainsStringIgnoringCase('resources/testfile1.txt', $arr['path']);
         $this->assertSame('randomName.txt', $arr['originalName']);
         $this->assertSame('abc', $arr['mimeType']);
 
@@ -170,11 +170,11 @@ class FormRenderingTest extends BaseTestCase
 
         $this->assertCount(2, $arr);
 
-        $this->assertContains('resources/testfile1.txt', $arr[0]['path']);
+        $this->assertStringContainsStringIgnoringCase('resources/testfile1.txt', $arr[0]['path']);
         $this->assertSame('randomName.txt', $arr[0]['originalName']);
         $this->assertSame('abc', $arr[0]['mimeType']);
 
-        $this->assertContains('resources/testfile1.txt', $arr[1]['path']);
+        $this->assertStringContainsStringIgnoringCase('resources/testfile1.txt', $arr[1]['path']);
         $this->assertSame('randomName2.txt', $arr[1]['originalName']);
         $this->assertNull($arr[1]['mimeType']);
 

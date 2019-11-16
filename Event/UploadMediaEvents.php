@@ -14,6 +14,11 @@ namespace UploadMediaBundle\Event;
 final class UploadMediaEvents
 {
     /**
+     * TODO.
+     */
+    const GETFILES = 'uploadmedia.getfiles';
+
+    /**
      * The KEEPFILE event occurs before the uploaded file is moved.
      *
      * This event allows you to decide if the file should be moved(kept) or not.
@@ -31,6 +36,16 @@ final class UploadMediaEvents
      * @Event("UploadMediaBundle\Events\UploadedEvent")
      */
     const UPLOAD = 'uploadmedia.upload';
+
+    /**
+     * TODO.
+     */
+    const CHUNKDATA = 'uploadmedia.chunkdata';
+
+    /**
+     * TODO.
+     */
+    const FILEDATA = 'uploadmedia.filedata';
 
     /**
      * TODO.

@@ -11,7 +11,7 @@
 
 namespace UploadMediaBundle\Event;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -19,22 +19,17 @@ if (!class_exists('Symfony\Contracts\EventDispatcher\Event')) {
     @class_alias('Symfony\Contracts\EventDispatcher\Event', 'Symfony\Component\EventDispatcher\Event');
 }
 
-class KeepfileEvent extends Event
+class GetFileDataEvent extends Event
 {
     protected $request;
     protected $uploadedFile;
-    protected $keepFile;
     protected $data;
 
-    public function __construct(UploadedFile $uploadedFile, Request $request)
+    public function __construct(File $uploadedFile, Request $request, array $data)
     {
         $this->uploadedFile = $uploadedFile;
         $this->request = $request;
-        $this->data = [
-            'originalName' => $uploadedFile->getClientOriginalName(),
-            'mimeType' => $uploadedFile->getClientMimeType(),
-            'extension' => $uploadedFile->guessClientExtension(),
-        ];
+        $this->data = $data;
     }
 
     public function getRequest(): Request
@@ -42,19 +37,9 @@ class KeepfileEvent extends Event
         return $this->request;
     }
 
-    public function getUploadedFile(): UploadedFile
+    public function getUploadedFile(): File
     {
         return $this->uploadedFile;
-    }
-
-    public function getKeepFile(): ?bool
-    {
-        return $this->keepFile;
-    }
-
-    public function setKeepFile(bool $keepFile)
-    {
-        $this->keepFile = $keepFile;
     }
 
     public function getData(): array
