@@ -28,6 +28,9 @@ class UploadMediaType extends AbstractType implements DataTransformerInterface
 {
     private $dataClass;
 
+    /**
+     * {@inheritdoc}
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $emptyData = function (Options $options) {
@@ -41,6 +44,7 @@ class UploadMediaType extends AbstractType implements DataTransformerInterface
             'multiple' => false,
             'empty_data' => $emptyData,
             'compound' => false,
+            'additiona_data' => null,
         ]);
 
         $resolver->setNormalizer('data_class', function (Options $options, $value) {
@@ -55,10 +59,19 @@ class UploadMediaType extends AbstractType implements DataTransformerInterface
         });
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['multiple']) {
             $view->vars['attr']['multiple'] = 'multiple';
+        }
+
+        if (\is_array($options['additiona_data'])) {
+            $view->vars['additiona_data'] = json_encode($options['additiona_data']);
+        } else {
+            $view->vars['additiona_data'] = (string) $options['additiona_data'];
         }
 
         $view->vars['multiple'] = $options['multiple'];
@@ -68,6 +81,9 @@ class UploadMediaType extends AbstractType implements DataTransformerInterface
         $view->vars['attr']['class'] = 'upload_result';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addViewTransformer($this);

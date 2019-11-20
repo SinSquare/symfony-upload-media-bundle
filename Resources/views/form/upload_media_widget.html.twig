@@ -3,7 +3,7 @@
     <div class="row fileupload-container">
         <div class="col">
             <div class="custom-file">
-                <input type="file" class="fileupload custom-file-input" accept="{{ accept }}" data-url="{{ path(upload_path_name) }}" {% if multiple %}multiple{% endif %} >
+                <input type="file" class="fileupload custom-file-input" accept="{{ accept }}" data-url="{{ path(upload_path_name) }}" {% if multiple %}multiple{% endif %} data-additionaldata="{{ additiona_data }}">
                 <label for="select_file" class="custom-file-label">Select files...</label>
           </div>
         </div>
