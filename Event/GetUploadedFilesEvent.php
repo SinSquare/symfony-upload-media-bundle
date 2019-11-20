@@ -27,8 +27,13 @@ class GetUploadedFilesEvent extends Event
 
         //by default all uploaded files will be processed
         foreach ($request->files->all() as $key => $files) {
-            if ($files instanceof UploadedFile) {
-                $this->uploadedFiles[] = $files;
+            if(!is_array($files)) {
+                $files = array($files);
+            }
+            foreach ($files as $file) {
+                if ($file instanceof UploadedFile) {
+                    $this->uploadedFiles[] = $file;
+                }
             }
         }
     }
