@@ -9,25 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace UploadMediaBundle\Tests\Unit\DataClass;
+namespace UploadMediaBundle\Tests\Unit\Controller\Basic;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use UploadMediaBundle\Controller\UploadMediaController;
-use UploadMediaBundle\Tests\Unit\AbstractEventTest;
+use UploadMediaBundle\Tests\Unit\AbstractTest;
 
-class UploadMediaTest extends AbstractEventTest
+class UploadMediaTest extends AbstractTest
 {
     public function testUploadFile()
     {
         $request = $this->createRequest();
         $file = $request->files->get(0);
         $dispatcher = new EventDispatcher();
-        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.sha1(uniqid('path', true).(string) microtime(true));
+        $dir = $this->dir.\DIRECTORY_SEPARATOR.'uploaded';
         mkdir($dir, 0777, true);
+        $this->assertSame(0, $this->countFilesInDir($dir));
 
         $controller = new UploadMediaController();
-
-        $this->assertSame(0, $this->countFilesInDir($dir));
 
         $data = $this->invokeMethod($controller, 'uploadFile', [$file, $request, $dispatcher, $dir]);
         $this->assertIsArray($data);

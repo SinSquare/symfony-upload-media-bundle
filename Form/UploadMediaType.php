@@ -159,7 +159,9 @@ class UploadMediaType extends AbstractType implements DataTransformerInterface
             if ($d instanceof UploadedMediaInterface) {
                 $newData[] = $d->toArray();
             } else {
+                // @codeCoverageIgnoreStart
                 throw new \LogicException(sprintf('All files has to be of class "%s", found instance of class "%s".', $this->dataClass, \get_class($d)));
+                // @codeCoverageIgnoreEnd
             }
         }
 

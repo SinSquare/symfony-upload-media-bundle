@@ -12,9 +12,9 @@
 namespace UploadMediaBundle\Tests\Unit\Event;
 
 use UploadMediaBundle\Event\GetChunkDataEvent;
-use UploadMediaBundle\Tests\Unit\AbstractEventTest;
+use UploadMediaBundle\Tests\Unit\AbstractTest;
 
-class GetChunkDataEventTest extends AbstractEventTest
+class GetChunkDataEventTest extends AbstractTest
 {
     public function test()
     {

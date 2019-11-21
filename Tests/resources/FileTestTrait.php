@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace UploadMediaBundle\Tests\Unit;
+namespace UploadMediaBundle\Tests\resources;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
-abstract class AbstractEventTest extends TestCase
+trait FileTestTrait
 {
     protected static $uploadedFileArgs;
+    protected $dir;
 
     protected function createFile(int $length = 128)
     {
-        $path = sys_get_temp_dir().\DIRECTORY_SEPARATOR.sha1(uniqid('path', true).(string) microtime(true));
+        $path = $this->dir.\DIRECTORY_SEPARATOR.sha1(uniqid('path', true).(string) microtime(true));
         file_put_contents($path, random_bytes($length));
 
         return $path;
@@ -76,9 +76,8 @@ abstract class AbstractEventTest extends TestCase
 
     protected function createUploadedFileChunk(UploadedFile $file, int $from, int $to): UploadedFile
     {
-        $dir = sys_get_temp_dir();
         $name = 'part_'.sha1(uniqid('part_', true));
-        $path = $dir.\DIRECTORY_SEPARATOR.$name;
+        $path = $this->dir.\DIRECTORY_SEPARATOR.$name;
 
         $handle = fopen($file->getRealPath(), 'r');
         fseek($handle, $from);
@@ -115,5 +114,36 @@ abstract class AbstractEventTest extends TestCase
         $files = scandir($directory);
 
         return \count($files) - 2;
+    }
+
+    protected function setUp(): void
+    {
+        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.sha1(uniqid('path', true).(string) microtime(true));
+        mkdir($dir, 0777, true);
+        $this->dir = $dir;
+        $this->assertSame(0, $this->countFilesInDir($dir));
+    }
+
+    protected function tearDown(): void
+    {
+        $this->deleteDir($this->dir);
+    }
+
+    protected function deleteDir(string $dir)
+    {
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ('.' !== $object && '..' !== $object) {
+                    if ('dir' === filetype($dir.'/'.$object)) {
+                        $this->deleteDir($dir.'/'.$object);
+                    } else {
+                        unlink($dir.'/'.$object);
+                    }
+                }
+            }
+            reset($objects);
+            rmdir($dir);
+        }
     }
 }

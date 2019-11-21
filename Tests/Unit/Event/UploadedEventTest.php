@@ -12,9 +12,9 @@
 namespace UploadMediaBundle\Tests\Unit\Event;
 
 use UploadMediaBundle\Event\UploadedEvent;
-use UploadMediaBundle\Tests\Unit\AbstractEventTest;
+use UploadMediaBundle\Tests\Unit\AbstractTest;
 
-class UploadedEventTest extends AbstractEventTest
+class UploadedEventTest extends AbstractTest
 {
     public function test()
     {
@@ -28,7 +28,7 @@ class UploadedEventTest extends AbstractEventTest
         $this->assertFalse($event->getIsMoved());
 
         $oldPath = \dirname($file->getPathname());
-        $newPath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'uploaded';
+        $newPath = $this->dir.\DIRECTORY_SEPARATOR.'uploaded';
 
         $newFile = $event->move($newPath);
         $this->assertNotSame($file, $newFile);

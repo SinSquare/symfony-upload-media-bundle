@@ -12,9 +12,9 @@
 namespace UploadMediaBundle\Tests\Unit\Event;
 
 use UploadMediaBundle\Event\GetFileDataEvent;
-use UploadMediaBundle\Tests\Unit\AbstractEventTest;
+use UploadMediaBundle\Tests\Unit\AbstractTest;
 
-class GetFileDataEventTest extends AbstractEventTest
+class GetFileDataEventTest extends AbstractTest
 {
     public function test()
     {

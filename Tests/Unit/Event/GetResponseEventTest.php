@@ -13,9 +13,9 @@ namespace UploadMediaBundle\Tests\Unit\Event;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use UploadMediaBundle\Event\GetResponseEvent;
-use UploadMediaBundle\Tests\Unit\AbstractEventTest;
+use UploadMediaBundle\Tests\Unit\AbstractTest;
 
-class GetResponseEventTest extends AbstractEventTest
+class GetResponseEventTest extends AbstractTest
 {
     public function test()
     {

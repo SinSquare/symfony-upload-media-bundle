@@ -18,5 +18,20 @@ not_empty_multiple_form:
     methods: [GET, POST]
     defaults:  { _controller: \UploadMediaBundle\Tests\Functional\app\Controller\TestController::getNotEmptyMultipleForm }
 
+additional_data_str_form:
+    path: /additional-data-str-form
+    methods: [GET, POST]
+    defaults:  { _controller: \UploadMediaBundle\Tests\Functional\app\Controller\TestController::getAdditionalDataStringForm }
+
+additional_data_json_form:
+    path: /additional-data-json-form
+    methods: [GET, POST]
+    defaults:  { _controller: \UploadMediaBundle\Tests\Functional\app\Controller\TestController::getAdditionalDataArrayForm }   
+
+get_single_data:
+    path: /get-single-data
+    methods: [GET, POST]
+    defaults:  { _controller: \UploadMediaBundle\Tests\Functional\app\Controller\TestController::getSingleDataAction }   
+
 _media:
     resource: '@UploadMediaBundle/Resources/config/routes.yaml'    

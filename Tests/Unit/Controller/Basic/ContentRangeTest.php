@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace UploadMediaBundle\Tests\Unit\DataClass;
+namespace UploadMediaBundle\Tests\Unit\Controller\Basic;
 
 use Symfony\Component\HttpFoundation\Request;
 use UploadMediaBundle\Controller\UploadMediaController;
-use UploadMediaBundle\Tests\Unit\AbstractEventTest;
+use UploadMediaBundle\Tests\Unit\AbstractTest;
 
-class ContentRangeTest extends AbstractEventTest
+class ContentRangeTest extends AbstractTest
 {
     public function testContentRangeOK()
     {

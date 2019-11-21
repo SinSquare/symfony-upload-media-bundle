@@ -35,17 +35,7 @@ class UploadMediaController extends AbstractController
      */
     public function uploadAction(Request $request, EventDispatcherInterface $dispatcher, string $uploadedMediaDirectory): Response
     {
-        $uploadedMediaDirectory = rtrim($uploadedMediaDirectory, '\\/');
-
-        if (!file_exists($uploadedMediaDirectory)) {
-            if (!mkdir($uploadedMediaDirectory, 0777, true)) {
-                throw new \RuntimeException(sprintf("Could not create upload directory '%s'", $uploadedMediaDirectory));
-            }
-        }
-
-        if (!is_dir($uploadedMediaDirectory) || !is_writable($uploadedMediaDirectory)) {
-            throw new \RuntimeException(sprintf("The upload path '%s' exists, but is not a directory or is not writable", $uploadedMediaDirectory));
-        }
+        $uploadedMediaDirectory = $this->ensureUploadDirectory($uploadedMediaDirectory);
 
         list($from, $to, $size) = $this->getContentRange($request);
 
@@ -61,7 +51,10 @@ class UploadMediaController extends AbstractController
             //non-chunked upload
             $data = [];
             foreach ($files as $file) {
-                $data[] = $this->uploadFile($file, $request, $dispatcher, $uploadedMediaDirectory);
+                $d = $this->uploadFile($file, $request, $dispatcher, $uploadedMediaDirectory);
+                if (\is_array($d)) {
+                    $data[] = $d;
+                }
             }
 
             $response = new JsonResponse(['data' => $data]);
@@ -278,5 +271,24 @@ class UploadMediaController extends AbstractController
         }
 
         return null;
+    }
+
+    protected function ensureUploadDirectory(string $uploadedMediaDirectory): string
+    {
+        $uploadedMediaDirectory = rtrim($uploadedMediaDirectory, '\\/');
+
+        // @codeCoverageIgnoreStart
+        if (!file_exists($uploadedMediaDirectory)) {
+            if (!mkdir($uploadedMediaDirectory, 0777, true)) {
+                throw new \RuntimeException(sprintf("Could not create upload directory '%s'", $uploadedMediaDirectory));
+            }
+        }
+
+        if (!is_dir($uploadedMediaDirectory) || !is_writable($uploadedMediaDirectory)) {
+            throw new \RuntimeException(sprintf("The upload path '%s' exists, but is not a directory or is not writable", $uploadedMediaDirectory));
+        }
+        // @codeCoverageIgnoreEnd
+
+        return $uploadedMediaDirectory;
     }
 }

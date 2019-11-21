@@ -12,9 +12,9 @@
 namespace UploadMediaBundle\Tests\Unit\DataClass;
 
 use UploadMediaBundle\DataClass\UploadedMedia;
-use UploadMediaBundle\Tests\Unit\AbstractEventTest;
+use UploadMediaBundle\Tests\Unit\AbstractTest;
 
-class UploadedMediaTest extends AbstractEventTest
+class UploadedMediaTest extends AbstractTest
 {
     private function assertMedia(UploadedMedia $media, string $path, string $originalName, string $mime = null)
     {

@@ -9,17 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace UploadMediaBundle\Tests\Unit\DataClass;
+namespace UploadMediaBundle\Tests\Unit\Controller\Basic;
 
 use UploadMediaBundle\Controller\UploadMediaController;
-use UploadMediaBundle\Tests\Unit\AbstractEventTest;
+use UploadMediaBundle\Tests\Unit\AbstractTest;
 
-class UniqueNameTest extends AbstractEventTest
+class FilenameTest extends AbstractTest
 {
     public function testNoFileNoExt()
     {
-        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.sha1(uniqid('path', true).(string) microtime(true));
-        mkdir($dir, 0777, true);
+        $dir = $this->dir;
         $this->assertSame(0, $this->countFilesInDir($dir));
 
         $originalName = 'testfile';
@@ -31,8 +30,7 @@ class UniqueNameTest extends AbstractEventTest
 
     public function testNoFileExt()
     {
-        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.sha1(uniqid('path', true).(string) microtime(true));
-        mkdir($dir, 0777, true);
+        $dir = $this->dir;
         $this->assertSame(0, $this->countFilesInDir($dir));
 
         $originalName = 'testfile';
@@ -47,8 +45,7 @@ class UniqueNameTest extends AbstractEventTest
     {
         $originalName = 'testfile';
 
-        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.sha1(uniqid('path', true).(string) microtime(true));
-        mkdir($dir, 0777, true);
+        $dir = $this->dir;
         file_put_contents($dir.\DIRECTORY_SEPARATOR.sha1($originalName), 'awbcs');
         $this->assertSame(1, $this->countFilesInDir($dir));
 
@@ -62,13 +59,22 @@ class UniqueNameTest extends AbstractEventTest
         $originalName = 'testfile';
         $ext = 'txt';
 
-        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.sha1(uniqid('path', true).(string) microtime(true));
-        mkdir($dir, 0777, true);
+        $dir = $this->dir;
         file_put_contents($dir.\DIRECTORY_SEPARATOR.sha1($originalName).'.'.$ext, 'awbcs');
         $this->assertSame(1, $this->countFilesInDir($dir));
 
         $controller = new UploadMediaController();
         $name = $this->invokeMethod($controller, 'getUniqueName', [$dir, $originalName]);
         $this->assertNotSame(sha1($originalName).'.'.$ext, $name);
+    }
+
+    public function testChunkname()
+    {
+        $originalName = 'testfile';
+        $dir = $this->dir;
+
+        $controller = new UploadMediaController();
+        $name = $this->invokeMethod($controller, 'getMultipartUniqueName', [$dir, $originalName]);
+        $this->assertSame('multipart_'.sha1($originalName), $name);
     }
 }

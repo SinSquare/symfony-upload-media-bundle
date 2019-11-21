@@ -16,14 +16,17 @@ use Nyholm\BundleTest\BaseBundleTestCase;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\TwigBundle\TwigBundle;
+use UploadMediaBundle\Tests\resources\FileTestTrait;
 use UploadMediaBundle\UploadMediaBundle;
 
 abstract class BaseTestCase extends BaseBundleTestCase
 {
+    use FileTestTrait { FileTestTrait::setUp as _setUp; }
     /**
      * @var AppKernel
      */
     protected $kernel;
+    protected $dir;
 
     protected function getBundleClass()
     {
@@ -32,6 +35,8 @@ abstract class BaseTestCase extends BaseBundleTestCase
 
     protected function setUp(): void
     {
+        $this->_setUp();
+
         $kernel = $this->createKernel();
         $kernel->addConfigFile(__DIR__.'/app/config/default.yml');
 

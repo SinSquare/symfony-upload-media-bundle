@@ -196,4 +196,48 @@ class FormRenderingTest extends BaseTestCase
 
         $this->assertSame($json, $newJson);
     }
+
+    public function testAdditionalDataString()
+    {
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/additional-data-str-form');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+
+        //check form rendering
+        $container = $crawler->filter('div.upload_media_container');
+        $this->assertCount(1, $container);
+        $container = $container->eq(0);
+
+        //upload element
+        $input = $container->filter('input.fileupload');
+        $this->assertCount(1, $input);
+        $this->assertSame('file', $input->getNode(0)->attributes->getNamedItem('type')->value);
+        $this->assertNull($input->getNode(0)->attributes->getNamedItem('name'));
+        $this->assertNull($input->getNode(0)->attributes->getNamedItem('multiple'));
+        $this->assertSame('/media/upload', $input->getNode(0)->attributes->getNamedItem('data-url')->value);
+        $this->assertSame('string_data', $input->getNode(0)->attributes->getNamedItem('data-additionaldata')->value);
+    }
+
+    public function testAdditionalDataArray()
+    {
+        $client = $this->createClient();
+        $crawler = $client->request('GET', '/additional-data-json-form');
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+
+        //check form rendering
+        $container = $crawler->filter('div.upload_media_container');
+        $this->assertCount(1, $container);
+        $container = $container->eq(0);
+
+        //upload element
+        $input = $container->filter('input.fileupload');
+        $this->assertCount(1, $input);
+        $this->assertSame('file', $input->getNode(0)->attributes->getNamedItem('type')->value);
+        $this->assertNull($input->getNode(0)->attributes->getNamedItem('name'));
+        $this->assertNull($input->getNode(0)->attributes->getNamedItem('multiple'));
+        $this->assertSame('/media/upload', $input->getNode(0)->attributes->getNamedItem('data-url')->value);
+        $this->assertSame('{"data":"abc"}', $input->getNode(0)->attributes->getNamedItem('data-additionaldata')->value);
+    }
 }

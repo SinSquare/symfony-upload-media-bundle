@@ -13,9 +13,11 @@ namespace UploadMediaBundle\Tests\Functional\app\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use UploadMediaBundle\DataClass\UploadedMedia;
+use UploadMediaBundle\Tests\Functional\app\Form\UploadAdditionalDataType;
 use UploadMediaBundle\Tests\Functional\app\Form\UploadMultipleType;
 use UploadMediaBundle\Tests\Functional\app\Form\UploadSingleType;
 
@@ -27,11 +29,11 @@ class TestController extends Controller
             UploadSingleType::class,
             null,
             [
-                'action' => $this->generateUrl('single_form'),
+                'action' => $this->generateUrl($request->attributes->get('_route')),
             ]
         );
 
-        $this->handleForm($request, $form);
+        $r = $this->handleForm($request, $form);
 
         return $this->render(
             '@App/index.html.twig',
@@ -48,7 +50,7 @@ class TestController extends Controller
             UploadMultipleType::class,
             null,
             [
-                'action' => $this->generateUrl('multiple_form'),
+                'action' => $this->generateUrl($request->attributes->get('_route')),
             ]
         );
 
@@ -71,7 +73,7 @@ class TestController extends Controller
             UploadSingleType::class,
             ['image' => $image],
             [
-                'action' => $this->generateUrl('not_empty_single_form'),
+                'action' => $this->generateUrl($request->attributes->get('_route')),
             ]
         );
 
@@ -97,11 +99,86 @@ class TestController extends Controller
             UploadSingleType::class,
             ['image' => $images],
             [
-                'action' => $this->generateUrl('not_empty_multiple_form'),
+                'action' => $this->generateUrl($request->attributes->get('_route')),
             ]
         );
 
         $this->handleForm($request, $form);
+
+        return $this->render(
+            '@App/index.html.twig',
+            [
+                'form' => $form->createView(),
+            ],
+            $this->getResponseByForm($form)
+        );
+    }
+
+    public function getAdditionalDataStringForm(Request $request)
+    {
+        $form = $this->createForm(
+            UploadAdditionalDataType::class,
+            null,
+            [
+                'action' => $this->generateUrl($request->attributes->get('_route')),
+                'additional_data' => 'string_data',
+            ]
+        );
+
+        $this->handleForm($request, $form);
+
+        return $this->render(
+            '@App/index.html.twig',
+            [
+                'form' => $form->createView(),
+            ],
+            $this->getResponseByForm($form)
+        );
+    }
+
+    public function getAdditionalDataArrayForm(Request $request)
+    {
+        $form = $this->createForm(
+            UploadAdditionalDataType::class,
+            null,
+            [
+                'action' => $this->generateUrl($request->attributes->get('_route')),
+                'additional_data' => ['data' => 'abc'],
+            ]
+        );
+
+        $this->handleForm($request, $form);
+
+        return $this->render(
+            '@App/index.html.twig',
+            [
+                'form' => $form->createView(),
+            ],
+            $this->getResponseByForm($form)
+        );
+    }
+
+    public function getSingleDataAction(Request $request)
+    {
+        $form = $this->createForm(
+            UploadSingleType::class,
+            null,
+            [
+                'action' => $this->generateUrl($request->attributes->get('_route')),
+            ]
+        );
+
+        $r = $this->handleForm($request, $form);
+        if ($r) {
+            if ($form->get('image')->getData() instanceof UploadedMedia) {
+                $imageArr = $form->get('image')->getData()->toArray();
+                $imageArr['new'] = $form->get('image')->getData()->getIsNew();
+            } else {
+                $imageArr = $form->get('image')->getData();
+            }
+
+            return new JsonResponse($imageArr);
+        }
 
         return $this->render(
             '@App/index.html.twig',

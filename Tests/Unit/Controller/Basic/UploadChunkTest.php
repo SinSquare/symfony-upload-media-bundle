@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace UploadMediaBundle\Tests\Unit\DataClass;
+namespace UploadMediaBundle\Tests\Unit\Controller\Basic;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use UploadMediaBundle\Controller\UploadMediaController;
-use UploadMediaBundle\Tests\Unit\AbstractEventTest;
+use UploadMediaBundle\Tests\Unit\AbstractTest;
 
-class UploadChunkTest extends AbstractEventTest
+class UploadChunkTest extends AbstractTest
 {
     public function testUploadChunk()
     {
@@ -26,12 +26,11 @@ class UploadChunkTest extends AbstractEventTest
         $request->files->set(0, $chunk);
 
         $dispatcher = new EventDispatcher();
-        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.sha1(uniqid('path', true).(string) microtime(true));
+        $dir = $this->dir.\DIRECTORY_SEPARATOR.'uploaded';
         mkdir($dir, 0777, true);
+        $this->assertSame(0, $this->countFilesInDir($dir));
 
         $controller = new UploadMediaController();
-
-        $this->assertSame(0, $this->countFilesInDir($dir));
 
         $data = $this->invokeMethod($controller, 'uploadChunk', [$chunk, $request, $dispatcher, $dir]);
         $this->assertIsArray($data);
@@ -73,12 +72,11 @@ class UploadChunkTest extends AbstractEventTest
         $request->files->set(0, $chunk);
 
         $dispatcher = new EventDispatcher();
-        $dir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.sha1(uniqid('path', true).(string) microtime(true));
+        $dir = $this->dir.\DIRECTORY_SEPARATOR.'uploaded';
         mkdir($dir, 0777, true);
+        $this->assertSame(0, $this->countFilesInDir($dir));
 
         $controller = new UploadMediaController();
-
-        $this->assertSame(0, $this->countFilesInDir($dir));
 
         $data = $this->invokeMethod($controller, 'uploadChunk', [$chunk, $request, $dispatcher, $dir]);
     }

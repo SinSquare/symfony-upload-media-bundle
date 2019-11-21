@@ -31,13 +31,14 @@ class EventDispatcherHelper
             $method = $reflectionClass->getMethod('dispatch');
             self::$dispatcherArgNum = $method->getNumberOfParameters();
         }
-
+        // @codeCoverageIgnoreStart
         if (1 === self::$dispatcherArgNum) {
             //new eventdispatcher
             $dispatcher->dispatch($event, $eventName);
 
             return;
         }
+        // @codeCoverageIgnoreEnd
 
         $dispatcher->dispatch($eventName, $event);
     }

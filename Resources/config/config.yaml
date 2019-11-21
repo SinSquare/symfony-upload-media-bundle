@@ -4,7 +4,3 @@ parameters:
 services:
     UploadMediaBundle\Controller\UploadMediaController:
         tags: ['controller.service_arguments']
-        
-    # UploadMediaBundle\EventListener\AddFilesizeListener:
-    #     tags:
-    #         - { name: kernel.event_listener, event: uploadmedia.response, method: addFilesize }
