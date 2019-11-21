@@ -13,7 +13,7 @@
     # start containers
     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml up -d
     # testing
-    - docker exec -w /code python Resources/gitlab_ci/run_version_tests.py
+    - docker exec -w /code php_test_image python Resources/gitlab_ci/run_version_tests.py
     # stopping container
     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml down
   tags:
