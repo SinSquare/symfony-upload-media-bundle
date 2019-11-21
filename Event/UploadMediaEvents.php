@@ -3,7 +3,7 @@
 /*
  * This file is part of the UploadMediaBundle.
  *
- * (c) Abel Katona <katona.abel at gmail.com>
+ * (c) Abel Katona <katona.abel@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,12 @@ namespace UploadMediaBundle\Event;
 final class UploadMediaEvents
 {
     /**
-     * TODO.
+     * The GETFILES event occurs at the beginning of the upload process.
+     *
+     * This event is for extracting the upload files from the request.
+     * By default it extracts all files.
+     *
+     * @Event("UploadMediaBundle\Events\GetUploadedFilesEvent")
      */
     const GETFILES = 'uploadmedia.getfiles';
 
@@ -31,24 +36,36 @@ final class UploadMediaEvents
     /**
      * The UPLOAD event occurs after the file is uploaded.
      *
-     * This event allows you to move, modify or delete the uploaded file.
+     * This event allows you to move, modify the uploaded file.
      *
      * @Event("UploadMediaBundle\Events\UploadedEvent")
      */
     const UPLOAD = 'uploadmedia.upload';
 
     /**
-     * TODO.
+     * The CHUNKDATA event occurs after the chunk is uploaded, and before the response is created.
+     *
+     * This event allows you to modify the data that will be sent back in an array form.
+     *
+     * @Event("UploadMediaBundle\Events\GetChunkDataEvent")
      */
     const CHUNKDATA = 'uploadmedia.chunkdata';
 
     /**
-     * TODO.
+     * The FILEDATA event occurs after the file is moved, and before the response is created.
+     *
+     * This event allows you to modify the data that will be sent back in an array form.
+     *
+     * @Event("UploadMediaBundle\Events\GetFileDataEvent")
      */
     const FILEDATA = 'uploadmedia.filedata';
 
     /**
-     * TODO.
+     * The RESPONSE event occurs before the response is sent back.
+     *
+     * This event allows you modify the response.
+     *
+     * @Event("UploadMediaBundle\Events\GetResponseEvent")
      */
     const RESPONSE = 'uploadmedia.response';
 }

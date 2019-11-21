@@ -1,5 +1,5 @@
 upload_media_ajax:
-    path: /media/upload
+    path: /upload-media
     controller: UploadMediaBundle\Controller\UploadMediaController::uploadAction
     defaults: { uploadedMediaDirectory: '%uploaded_media_directory%'}
     

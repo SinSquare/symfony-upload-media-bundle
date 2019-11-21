@@ -1,6 +1,14 @@
 {
     "name": "subbeta/upload-media-bundle",
-    "type": "library",
+    "type": "symfony-bundle",
+    "description": "",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Abel Katona",
+            "email": "katona.abel@gmail.com"
+        }
+    ],
     "require": {
         "php": "^7.1.3",
         "symfony/form": "^3.4 || ^4.0",
@@ -24,7 +32,10 @@
     },
     "autoload": {
         "psr-4": {
-            "UploadMediaBundle\\": ""
+            "UploadMediaBundle\\": "",
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
         }
     }
 }

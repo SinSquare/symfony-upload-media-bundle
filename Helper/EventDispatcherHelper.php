@@ -3,7 +3,7 @@
 /*
  * This file is part of the UploadMediaBundle.
  *
- * (c) Abel Katona <katona.abel at gmail.com>
+ * (c) Abel Katona <katona.abel@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,6 +14,9 @@ namespace UploadMediaBundle\Helper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @codeCoverageIgnore
+ */
 class EventDispatcherHelper
 {
     private static $dispatcherArgNum;
@@ -31,14 +34,12 @@ class EventDispatcherHelper
             $method = $reflectionClass->getMethod('dispatch');
             self::$dispatcherArgNum = $method->getNumberOfParameters();
         }
-        // @codeCoverageIgnoreStart
         if (1 === self::$dispatcherArgNum) {
             //new eventdispatcher
             $dispatcher->dispatch($event, $eventName);
 
             return;
         }
-        // @codeCoverageIgnoreEnd
 
         $dispatcher->dispatch($eventName, $event);
     }
