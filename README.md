@@ -161,37 +161,37 @@ public function uploadAction(Request $request): Response
 
 ## Events
 
-* **UploadMediaEvents::GETFILES**
-	The GETFILES event occurs at the beginning of the upload process.
-	This event is for extracting the upload files from the request.
-	By default it extracts all files.
-	@Event("UploadMediaBundle\Events\GetUploadedFilesEvent")
+* **UploadMediaEvents::GETFILES**  
+	The GETFILES event occurs at the beginning of the upload process.  
+	This event is for extracting the upload files from the request.  
+	By default it extracts all files.  
+	@Event("UploadMediaBundle\Events\GetUploadedFilesEvent")  
 
-* **UploadMediaEvents::KEEPFILE**
-	The KEEPFILE event occurs before the uploaded file is moved.
-	This event allows you to decide if the file should be moved(kept) or not.
-	If it is not moved, the file will be deleted after the script executed.
-	@Event("UploadMediaBundle\Events\KeepfileEvent")
+* **UploadMediaEvents::KEEPFILE**  
+	The KEEPFILE event occurs before the uploaded file is moved.  
+	This event allows you to decide if the file should be moved(kept) or not.  
+	If it is not moved, the file will be deleted after the script executed.  
+	@Event("UploadMediaBundle\Events\KeepfileEvent")  
 
-* **UploadMediaEvents::UPLOAD**
-	The UPLOAD event occurs after the file is uploaded.
-	This event allows you to move, modify the uploaded file.
-	@Event("UploadMediaBundle\Events\UploadedEvent")
+* **UploadMediaEvents::UPLOAD**  
+	The UPLOAD event occurs after the file is uploaded.  
+	This event allows you to move, modify the uploaded file.  
+	@Event("UploadMediaBundle\Events\UploadedEvent")  
 
-* **UploadMediaEvents::FILEDATA**
-	The FILEDATA event occurs after the file is moved, and before the response is created.
-	This event allows you to modify the data that will be sent back in an array form.
-	@Event("UploadMediaBundle\Events\GetFileDataEvent")
+* **UploadMediaEvents::FILEDATA**  
+	The FILEDATA event occurs after the file is moved, and before the response is created.  
+	This event allows you to modify the data that will be sent back in an array form.  
+	@Event("UploadMediaBundle\Events\GetFileDataEvent")  
 
-* **UploadMediaEvents::CHUNKDATA**
-	The CHUNKDATA event occurs after the chunk is uploaded, and before the response is created.
-	This event allows you to modify the data that will be sent back in an array form.
-	@Event("UploadMediaBundle\Events\GetChunkDataEvent")
+* **UploadMediaEvents::CHUNKDATA**  
+	The CHUNKDATA event occurs after the chunk is uploaded, and before the response is created.  
+	This event allows you to modify the data that will be sent back in an array form.  
+	@Event("UploadMediaBundle\Events\GetChunkDataEvent")  
 
-* **UploadMediaEvents::RESPONSE**
-	The RESPONSE event occurs before the response is sent back.
-	This event allows you modify the response.
-	@Event("UploadMediaBundle\Events\GetResponseEvent")
+* **UploadMediaEvents::RESPONSE**  
+	The RESPONSE event occurs before the response is sent back.  
+	This event allows you modify the response.  
+	@Event("UploadMediaBundle\Events\GetResponseEvent")  
   
 ## Custom data class
 
