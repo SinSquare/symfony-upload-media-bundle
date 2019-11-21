@@ -1,3 +1,6 @@
+include:
+  template: Dependency-Scanning.gitlab-ci.yml
+
 .test_template: &job_definition
   stage: test
   image: docker:stable
