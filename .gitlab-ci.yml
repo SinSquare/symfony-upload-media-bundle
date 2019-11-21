@@ -10,14 +10,10 @@
     # install docker compose
     - apk add --update python py-pip python-dev && pip install --quiet docker-compose~=1.23.0
     - docker-compose version
-    # create custom composer file
-    - python Resources/gitlab_ci/create_composer.py $SYMFONY_VERSION
     # start containers
     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml up -d
-    # init
-    - docker exec -w /code -e COMPOSER=custom_composer.json php_test_image composer install --prefer-dist --no-suggest --no-progress
     # testing
-    - docker exec -w /code php_test_image php vendor/bin/phpunit
+    - docker exec -w /code python Resources/gitlab_ci/run_version_tests.py
     # stopping container
     - docker-compose -f Resources/gitlab_ci/docker-compose.test.yml down
   tags:
@@ -70,65 +66,15 @@ build:php73:
   tags:
     - docker
 
-test:php72_s34:
+tests:php72:
   <<: *job_definition
   variables:
     IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
-    SYMFONY_VERSION: 3.4.*
 
-test:php72_s40:
-  <<: *job_definition
-  variables:
-    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
-    SYMFONY_VERSION: 4.0.*
-
-test:php72_s41:
-  <<: *job_definition
-  variables:
-    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
-    SYMFONY_VERSION: 4.1.*
-
-test:php72_s42:
-  <<: *job_definition
-  variables:
-    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
-    SYMFONY_VERSION: 4.2.*
-
-test:php72_s43:
-  <<: *job_definition
-  variables:
-    IMAGE_PATH: $CI_REGISTRY_IMAGE:php72
-    SYMFONY_VERSION: 4.3.*
-
-test:php73_s34:
+tests:php73:
   <<: *job_definition
   variables:
     IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
-    SYMFONY_VERSION: 3.4.*
-
-test:php73_s40:
-  <<: *job_definition
-  variables:
-    IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
-    SYMFONY_VERSION: 4.0.*
-
-test:php73_s41:
-  <<: *job_definition
-  variables:
-    IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
-    SYMFONY_VERSION: 4.1.*
-
-test:php73_s42:
-  <<: *job_definition
-  variables:
-    IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
-    SYMFONY_VERSION: 4.2.*
-
-test:php73_s43:
-  <<: *job_definition
-  variables:
-    IMAGE_PATH: $CI_REGISTRY_IMAGE:php73
-    SYMFONY_VERSION: 4.3.*
 
 test:php73_latest:
   stage: test

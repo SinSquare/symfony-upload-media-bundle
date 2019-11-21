@@ -17,6 +17,7 @@ RUN buildDeps=" \
         libzip-dev \
         sqlite3 \
         libgmp-dev \
+        python \
     " \
     && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y $buildDeps $runtimeDeps \
     && docker-php-ext-install bcmath bz2 calendar iconv intl mbstring zip \
