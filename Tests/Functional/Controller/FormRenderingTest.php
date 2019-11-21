@@ -39,7 +39,7 @@ class FormRenderingTest extends BaseTestCase
         $this->assertSame('file', $input->getNode(0)->attributes->getNamedItem('type')->value);
         $this->assertNull($input->getNode(0)->attributes->getNamedItem('name'));
         $this->assertNull($input->getNode(0)->attributes->getNamedItem('multiple'));
-        $this->assertSame('/media/upload', $input->getNode(0)->attributes->getNamedItem('data-url')->value);
+        $this->assertSame('/upload-media', $input->getNode(0)->attributes->getNamedItem('data-url')->value);
 
         //hidden element
         $input = $container->filter('input.upload_result');
@@ -92,7 +92,7 @@ class FormRenderingTest extends BaseTestCase
         $this->assertSame('file', $input->getNode(0)->attributes->getNamedItem('type')->value);
         $this->assertNull($input->getNode(0)->attributes->getNamedItem('name'));
         $this->assertNotNull($input->getNode(0)->attributes->getNamedItem('multiple'));
-        $this->assertSame('/media/upload', $input->getNode(0)->attributes->getNamedItem('data-url')->value);
+        $this->assertSame('/upload-media', $input->getNode(0)->attributes->getNamedItem('data-url')->value);
 
         //submit
         $form = $crawler->selectButton('form_save_button')->form();
@@ -215,7 +215,7 @@ class FormRenderingTest extends BaseTestCase
         $this->assertSame('file', $input->getNode(0)->attributes->getNamedItem('type')->value);
         $this->assertNull($input->getNode(0)->attributes->getNamedItem('name'));
         $this->assertNull($input->getNode(0)->attributes->getNamedItem('multiple'));
-        $this->assertSame('/media/upload', $input->getNode(0)->attributes->getNamedItem('data-url')->value);
+        $this->assertSame('/upload-media', $input->getNode(0)->attributes->getNamedItem('data-url')->value);
         $this->assertSame('string_data', $input->getNode(0)->attributes->getNamedItem('data-additionaldata')->value);
     }
 
@@ -237,7 +237,7 @@ class FormRenderingTest extends BaseTestCase
         $this->assertSame('file', $input->getNode(0)->attributes->getNamedItem('type')->value);
         $this->assertNull($input->getNode(0)->attributes->getNamedItem('name'));
         $this->assertNull($input->getNode(0)->attributes->getNamedItem('multiple'));
-        $this->assertSame('/media/upload', $input->getNode(0)->attributes->getNamedItem('data-url')->value);
+        $this->assertSame('/upload-media', $input->getNode(0)->attributes->getNamedItem('data-url')->value);
         $this->assertSame('{"data":"abc"}', $input->getNode(0)->attributes->getNamedItem('data-additionaldata')->value);
     }
 }
