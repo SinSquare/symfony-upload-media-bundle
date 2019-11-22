@@ -62,8 +62,8 @@ class UploadType extends AbstractType
                     //'multiple' => false,
                     //'additiona_data' => array("data" => 'data')   
                     //'data_class' => UploadedMedia::class,
-            		//'accept' => 'image/*',
-            		//'upload_path_name' => 'upload_media_ajax',  
+                    //'accept' => 'image/*',
+                    //'upload_path_name' => 'upload_media_ajax',  
                 )
             )
         ;
@@ -148,13 +148,13 @@ $(document).ready(function() {
 
 public function uploadAction(Request $request): Response
 {
-	// ...
+    // ...
 
-	$form->handleRequest($request);
-	$images = $form->get('image')->getData();
-	// images is a single UploadedMedia object, or an array of UploadedMedia objects in case of multiple => true
+    $form->handleRequest($request);
+    $images = $form->get('image')->getData();
+    // images is a single UploadedMedia object, or an array of UploadedMedia objects in case of multiple => true
 
-	// ...
+    // ...
 }
 
 ```
@@ -162,36 +162,36 @@ public function uploadAction(Request $request): Response
 ## Events
 
 * **UploadMediaEvents::GETFILES**  
-	The GETFILES event occurs at the beginning of the upload process.  
-	This event is for extracting the upload files from the request.  
-	By default it extracts all files.  
-	@Event("UploadMediaBundle\Events\GetUploadedFilesEvent")  
+    The GETFILES event occurs at the beginning of the upload process.  
+    This event is for extracting the upload files from the request.  
+    By default it extracts all files.  
+    @Event("UploadMediaBundle\Events\GetUploadedFilesEvent")  
 
 * **UploadMediaEvents::KEEPFILE**  
-	The KEEPFILE event occurs before the uploaded file is moved.  
-	This event allows you to decide if the file should be moved(kept) or not.  
-	If it is not moved, the file will be deleted after the script executed.  
-	@Event("UploadMediaBundle\Events\KeepfileEvent")  
+    The KEEPFILE event occurs before the uploaded file is moved.  
+    This event allows you to decide if the file should be moved(kept) or not.  
+    If it is not moved, the file will be deleted after the script executed.  
+    @Event("UploadMediaBundle\Events\KeepfileEvent")  
 
 * **UploadMediaEvents::UPLOAD**  
-	The UPLOAD event occurs after the file is uploaded.  
-	This event allows you to move, modify the uploaded file.  
-	@Event("UploadMediaBundle\Events\UploadedEvent")  
+    The UPLOAD event occurs after the file is uploaded.  
+    This event allows you to move, modify the uploaded file.  
+    @Event("UploadMediaBundle\Events\UploadedEvent")  
 
 * **UploadMediaEvents::FILEDATA**  
-	The FILEDATA event occurs after the file is moved, and before the response is created.  
-	This event allows you to modify the data that will be sent back in an array form.  
-	@Event("UploadMediaBundle\Events\GetFileDataEvent")  
+    The FILEDATA event occurs after the file is moved, and before the response is created.  
+    This event allows you to modify the data that will be sent back in an array form.  
+    @Event("UploadMediaBundle\Events\GetFileDataEvent")  
 
 * **UploadMediaEvents::CHUNKDATA**  
-	The CHUNKDATA event occurs after the chunk is uploaded, and before the response is created.  
-	This event allows you to modify the data that will be sent back in an array form.  
-	@Event("UploadMediaBundle\Events\GetChunkDataEvent")  
+    The CHUNKDATA event occurs after the chunk is uploaded, and before the response is created.  
+    This event allows you to modify the data that will be sent back in an array form.  
+    @Event("UploadMediaBundle\Events\GetChunkDataEvent")  
 
 * **UploadMediaEvents::RESPONSE**  
-	The RESPONSE event occurs before the response is sent back.  
-	This event allows you modify the response.  
-	@Event("UploadMediaBundle\Events\GetResponseEvent")  
+    The RESPONSE event occurs before the response is sent back.  
+    This event allows you modify the response.  
+    @Event("UploadMediaBundle\Events\GetResponseEvent")  
   
 ## Custom data class
 
@@ -221,7 +221,7 @@ class UploadType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-    	// ... 
+        // ... 
             ->add(
                 'image',
                 UploadMediaType::class,
@@ -255,8 +255,8 @@ class MediaSubscriber implements EventSubscriberInterface
 
     public function getMediaResponse(GetFileDataEvent $event)
     {
-    	// ... 
-    	$event->setData($data);
+        // ... 
+        $event->setData($data);
     }
 }
 
