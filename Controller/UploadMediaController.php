@@ -94,6 +94,9 @@ class UploadMediaController extends AbstractController
         //get basic data
         $originalName = $file->getClientOriginalName();
         $ext = $file->guessClientExtension();
+        if(empty($ext)) {
+            $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+        }
 
         //modify/move the file
         $uploadEvent = new UploadedEvent($file, $request);
@@ -136,6 +139,9 @@ class UploadMediaController extends AbstractController
 
         $originalName = $file->getClientOriginalName();
         $ext = $file->guessClientExtension();
+        if(empty($ext)) {
+            $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+        }
 
         $chunkBaseName = $this->getMultipartUniqueName($uploadedMediaDirectory, $originalName);
         $chunkName = sprintf('%s_%d_%d_%d', $chunkBaseName, $from, $to, $size);
