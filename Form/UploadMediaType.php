@@ -97,6 +97,10 @@ class UploadMediaType extends AbstractType implements DataTransformerInterface
             }
 
             $dataArr = json_decode($data, true);
+            if(!is_array($dataArr)) {
+                # try to decode again
+                $dataArr = json_decode(urldecode($data), true);                
+            }
             if (!\is_array($dataArr)) {
                 $event->setData($options['empty_data']);
 
