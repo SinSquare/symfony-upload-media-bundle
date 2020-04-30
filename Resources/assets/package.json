@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "app",
     "dependencies": {
-        "jquery": "3.4.1",
+        "jquery": "3.5.0",
         "blueimp-file-upload": "^10.2.0"
     },
     "browserslist": [
