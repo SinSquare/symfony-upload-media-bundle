@@ -1,9 +1,6 @@
-include:
-  template: Dependency-Scanning.gitlab-ci.yml
-
 .test_template: &job_definition
   stage: test
-  image: docker:stable
+  image: docker:19.03.8
   services:
     - docker:dind
   script:
@@ -22,7 +19,7 @@ include:
   tags:
     - docker
 
-image: docker:stable
+image: docker:19.03.8
 
 services:
   - docker:dind
@@ -41,7 +38,7 @@ stages:
 
 build:php72:
   stage: build
-  image: docker:stable
+  image: docker:19.03.8
   services:
     - docker:dind
   variables:
@@ -56,7 +53,7 @@ build:php72:
 
 build:php73:
   stage: build
-  image: docker:stable
+  image: docker:19.03.8
   services:
     - docker:dind
   variables:
@@ -81,7 +78,7 @@ tests:php73:
 
 test:php73_latest:
   stage: test
-  image: docker:stable
+  image: docker:19.03.8
   services:
     - docker:dind
   variables:
